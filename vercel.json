@@ -1,25 +1,16 @@
 {
   "version": 2,
   "buildCommand": "npm install",
-  "framework": "express",
   "functions": {
     "api/index.js": {
       "memory": 1024,
-      "maxDuration": 30
-    },
-    "frontend-server.js": {
-      "memory": 512,
       "maxDuration": 30
     }
   },
   "routes": [
     {
-      "src": "/api/(.*)",
-      "dest": "api/index.js"
-    },
-    {
       "src": "/(.*)",
-      "dest": "frontend-server.js"
+      "dest": "api/index.js"
     }
   ]
 }
