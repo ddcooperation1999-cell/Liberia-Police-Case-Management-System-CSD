@@ -1,19 +1,21 @@
 {
   "version": 2,
-  "builds": [
-    {
-      "src": "frontend-server.js",
-      "use": "@vercel/node"
+  "buildCommand": "npm install",
+  "framework": "express",
+  "functions": {
+    "api/index.js": {
+      "memory": 1024,
+      "maxDuration": 30
     },
-    {
-      "src": "backend/index.js",
-      "use": "@vercel/node"
+    "frontend-server.js": {
+      "memory": 512,
+      "maxDuration": 30
     }
-  ],
+  },
   "routes": [
     {
       "src": "/api/(.*)",
-      "dest": "backend/index.js"
+      "dest": "api/index.js"
     },
     {
       "src": "/(.*)",
