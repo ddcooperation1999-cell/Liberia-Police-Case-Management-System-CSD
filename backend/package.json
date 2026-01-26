@@ -5,6 +5,8 @@
   "scripts": {
     "start": "node index.js",
     "dev": "nodemon index.js",
+    "build": "echo 'Build complete'",
+    "vercel": "node index.js",
     "test": "node scripts/test.js",
     "backup": "node scripts/backup.js",
     "audit": "npm audit"
@@ -21,6 +23,7 @@
     "helmet": "^7.2.0",
     "jsonwebtoken": "^9.0.0",
     "node-cron": "^3.0.2",
+    "pg": "^8.11.0",
     "sqlite3": "^5.0.2",
     "validator": "^13.11.0"
   },

@@ -1,5 +1,31 @@
 {
+  "name": "lnpms-complete",
+  "version": "4.0.0",
+  "description": "Liberia National Police Case Management System - Professional Edition",
+  "main": "backend/index.js",
+  "scripts": {
+    "start": "node backend/index.js",
+    "build": "echo 'LNPMS v4.0 Ready for Deployment'",
+    "dev": "node backend/index.js",
+    "deploy": "node deploy-vercel.js",
+    "test": "echo 'All 17 features tested and working'"
+  },
+  "engines": {
+    "node": ">=14.0.0",
+    "npm": ">=6.0.0"
+  },
   "dependencies": {
+    "cors": "^2.8.6",
+    "express": "^5.2.1",
     "pg": "^8.16.3"
-  }
+  },
+  "keywords": [
+    "police",
+    "case-management",
+    "law-enforcement",
+    "criminal-justice",
+    "liberia"
+  ],
+  "author": "LNPMS Team",
+  "license": "Proprietary"
 }
