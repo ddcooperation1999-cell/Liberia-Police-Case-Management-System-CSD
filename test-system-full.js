@@ -5,32 +5,8 @@
  * Tests all 17 features and core functionality
  */
 
-const http = require('http');
-
-const BASE_URL = 'http://localhost:3001';
-
-// Color codes for terminal output
-const colors = {
-  reset: '\x1b[0m',
-  green: '\x1b[32m',
-  red: '\x1b[31m',
-  yellow: '\x1b[33m',
-  blue: '\x1b[34m',
-  cyan: '\x1b[36m'
-};
-
-let testToken = null;
-
-// Simple sleep helper
-function sleep(ms) {
-  return new Promise(resolve => setTimeout(resolve, ms));
-}
-
-// Helper function to make HTTP requests with retry/backoff on 429
-async function request(method, path, body = null, attempt = 0) {
-  const maxRetries = 5;
-  const baseDelay = 300; // ms
-
+// Helper function to make a single HTTP request (CI: no retries, no fallbacks)
+function request(method, path, body = null) {
   return new Promise((resolve, reject) => {
     const url = new URL(path, BASE_URL);
     const options = {
@@ -44,36 +20,23 @@ async function request(method, path, body = null, attempt = 0) {
       }
     };
 
-
-    // For debugging, but keep concise
-
     const req = http.request(options, (res) => {
       let data = '';
       res.on('data', chunk => data += chunk);
-      res.on('end', async () => {
-        const status = res.statusCode;
-        // Retry on 429 Too Many Requests
-        if (status === 429 && attempt < maxRetries) {
-          const delay = baseDelay * Math.pow(2, attempt);
-          console.log(`  Retry ${attempt + 1}/${maxRetries} for ${path} after ${delay}ms (429)`);
-          await sleep(delay);
-          try {
-            const r = await request(method, path, body, attempt + 1);
-            return resolve(r);
-          } catch (e) {
-            return reject(e);
-          }
-        }
-
+      res.on('end', () => {
         try {
-          resolve({ status: status, body: data ? JSON.parse(data) : null });
+          resolve({ status: res.statusCode, body: data ? JSON.parse(data) : null });
         } catch (e) {
-          resolve({ status: status, body: data });
+          resolve({ status: res.statusCode, body: data });
         }
       });
     });
 
-    req.on('error', async (err) => {
+    req.on('error', reject);
+    if (body) req.write(JSON.stringify(body));
+    req.end();
+  });
+}
       // On network errors, attempt a limited retry
       if (attempt < maxRetries) {
         const delay = baseDelay * Math.pow(2, attempt);
@@ -120,8 +83,6 @@ async function runTests() {
     failed++;
     return;
   }
-  // small pause to avoid rate limits
-  await sleep(150);
   // Test 2: Authentication
   try {
     console.log(`${colors.blue}Testing: Authentication${colors.reset}`);
@@ -144,8 +105,6 @@ async function runTests() {
     failed++;
   }
 
-  // small pause to avoid rate limits
-  await sleep(150);
 
   // Test 3: Case Management
   try {
@@ -181,8 +140,6 @@ async function runTests() {
     failed++;
   }
 
-  // small pause to avoid rate limits
-  await sleep(150);
 
   // Test 4: Analytics
   try {
@@ -206,8 +163,6 @@ async function runTests() {
     failed++;
   }
 
-  // brief pause before feature loop
-  await sleep(200);
 
   // Test 5: Feature Endpoints
   const features = [
@@ -237,8 +192,7 @@ async function runTests() {
       console.log(`  ${colors.red}✗${colors.reset} ${feature.name}`);
       failed++;
     }
-    // small delay between feature requests
-    await sleep(120);
+    // no artificial delays in CI harness
   }
   console.log();
 
