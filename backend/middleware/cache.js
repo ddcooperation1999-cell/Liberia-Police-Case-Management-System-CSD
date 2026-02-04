@@ -28,7 +28,7 @@ const cacheMiddleware = (duration = CACHE_DURATIONS.medium) => {
 
     // Check if cached data exists and is still valid
     if (cached && cached.expiresAt > Date.now()) {
-      console.log(`Cache HIT for ${cacheKey}`);
+      if (process.env.NODE_ENV === 'development') console.log(`Cache HIT for ${cacheKey}`);
       return res.json(cached.data);
     }
 
@@ -46,7 +46,7 @@ const cacheMiddleware = (duration = CACHE_DURATIONS.medium) => {
         data,
         expiresAt: Date.now() + duration,
       });
-      console.log(`Cache SET for ${cacheKey} (${duration}ms)`);
+      if (process.env.NODE_ENV === 'development') console.log(`Cache SET for ${cacheKey} (${duration}ms)`);
       return originalJson(data);
     };
 
